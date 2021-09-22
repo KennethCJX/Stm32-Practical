@@ -1,0 +1,12 @@
+Timer.c:11:10:getTimerFreq	16	static
+Timer.c:15:6:tmrConfigure	24	static
+Timer.c:30:6:CaptureCompare_config_P1	16	static
+Timer.c:36:6:CaptureCompare_config_P2_state1	16	static
+Timer.c:41:6:CaptureCompare_config_P2_state2	16	static
+Timer.c:46:6:CaptureCompare_config_P3	16	static
+Timer.c:50:6:tmrConfigureEventGeneration	16	static
+Timer.c:54:6:setTimerPrescaler	16	static
+Timer.c:58:6:setTimerARR	16	static
+Timer.c:62:6:set_PWM_Freq	24	static
+Timer.c:68:6:setTimerCaptureCompareReg	24	static
+Timer.c:79:6:set_PWM_Duty_Cycle	24	static

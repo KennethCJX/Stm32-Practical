@@ -1,0 +1,263 @@
+/*
+ * Tmr1.h
+ *
+ *  Created on: Aug 2, 2021
+ *      Author: ken chow
+ */
+
+#ifndef INC_TIMER_H_
+#define INC_TIMER_H_
+
+#include <stdint.h>
+#include "IO.h"
+
+//All TIMER base address
+#define TMR1_BASE_ADDRESS				0x40010000
+#define TMR2_BASE_ADDRESS				0x40000000
+#define TMR3_BASE_ADDRESS				0x40000400
+#define TMR4_BASE_ADDRESS				0x40000800
+#define TMR5_BASE_ADDRESS				0x40000C00
+#define TMR9_BASE_ADDRESS				0x40014000
+#define TMR10_BASE_ADDRESS				0x40014400
+#define TMR11_BASE_ADDRESS				0x40014800
+
+//All TIMERS pointers
+#define tmr1							((TmrReg*)TMR1_BASE_ADDRESS)
+#define tmr2							((TmrReg*)TMR2_BASE_ADDRESS)
+#define tmr3							((TmrReg*)TMR3_BASE_ADDRESS)
+#define tmr4							((TmrReg*)TMR4_BASE_ADDRESS)
+#define tmr5							((TmrReg*)TMR5_BASE_ADDRESS)
+#define tmr9							((TmrReg*)TMR9_BASE_ADDRESS)
+#define tmr10							((TmrReg*)TMR10_BASE_ADDRESS)
+#define tmr11							((TmrReg*)TMR11_BASE_ADDRESS)
+
+//Timer Control Register Mask
+#define TIMER_CR1_MASK					0x3FF
+#define TIMER_CR2_MASK					0x7FFD
+#define TIMER_SMCR_MASK					0xFFF7
+#define TIMER_DIER_MASK					0x7FFF
+
+#define	ARR_Num							65000
+
+typedef struct TmrReg_t TmrReg;
+struct TmrReg_t{
+	_IO_ uint32_t CR1;
+	_IO_ uint32_t CR2;
+	_IO_ uint32_t SMCR;
+	_IO_ uint32_t DIER;
+	_IO_ uint32_t SR;
+	_IO_ uint32_t EGR;
+	_IO_ uint32_t CCMR1;
+	_IO_ uint32_t CCMR2;
+	_IO_ uint32_t CCER;
+	_IO_ uint32_t CNT;
+	_IO_ uint32_t PSC;
+	_IO_ uint32_t ARR;
+	_IO_ uint32_t RCR;
+	_IO_ uint32_t CCR1;
+	_IO_ uint32_t CCR2;
+	_IO_ uint32_t CCR3;
+	_IO_ uint32_t CCR4;
+	_IO_ uint32_t BDTR;
+	_IO_ uint32_t DCR;
+	_IO_ uint32_t DMAR;
+	_IO_ uint32_t OR;
+};
+
+#define tmrSetOutCompareReg(tim, ch, val)				\
+	((_IO_ uint32_t *)&(tim)->CCR1)[(ch - 1)] = (val)
+
+#define tmrGetInCaptureReg(tim, ch, val)				\
+	((_IO_ uint32_t *)&(tim)->CCR1)[(ch - 1)]
+
+typedef enum{
+	//EGR
+	TMR_UG_NO_ACTION = 0 << 0,TMR_UG_EN = 1 << 0,
+	TMR_CC1G_NO_ACTION = 0 << 1, TMR_CC1G_CMP_EVENT= 1 << 1,
+	TMR_CC2G_NO_ACTION = 0 << 2, TMR_CC2G_CMP_EVENT= 1 << 2,
+	TMR_CC3G_NO_ACTION = 0 << 3, TMR_CC3G_CMP_EVENT= 1 << 3,
+	TMR_CC4G_NO_ACTION = 0 << 4, TMR_CC4G_CMP_EVENT= 1 << 4,
+	TMR_COMG_NO_ACTION = 0 << 5, TMR_COMG_EN = 1 <<5,
+	TMR_TG_NO_ACTION = 0 << 6, TMR_TG_EN = 0 << 6,
+	TMR_BREAK_NO_ACTION = 0 << 7, TMR_BREAK_EN = 1 << 7,
+}TimerEventGenConfig;
+
+typedef enum{
+	//CR1
+	TMR_CEN_EN= 1 << 0,
+	TMR_UPDATE_EN= 0 << 1, TMR_UPDATE_DISABLE= 1 << 1,
+	TMR_URS = 1 << 2,
+	TMR_OPM_EN = 1 << 3,
+	TMR_DIR_UP = 0 << 4, TMR_DIR_DOWN = 1 << 4,
+	TMR_CMS_EDGE = 0 << 5, TMR_MODE1 = 1 << 5, TMR_MODE2 = 2 << 5, TMR_MODE3 = 3 << 5,
+	TMR_ARP_EN = 1 << 7,
+	TMR_CLK_DIV_1 = 0 << 8, TMR_CLK_DIV_2 = 1 << 8, TMR_CLK_DIV_4 = 2 << 8,
+
+	//CR2
+	TMR_CCPC_EN = 1 << (0 + 16),
+	TMR_CCUS_SEL1 = 0 << (2 + 16), TMR_CCUS_SEL2 = 1 << (2 + 16),
+	TMR_CCDS_CCX_EVENT = 0 << (3 + 16), TMR_CCDS_UPDATE = 1 << (3 + 16),
+	TMR_MMS_RST = 0 << (4 + 16), TMR_MMS_EN = 1 << (4 + 16), TMR_MMS_UPDATE = 2 << (4 + 16),
+	TMR_MMS_CMP_PULSE = 3 << (4 + 16), TMR_MMS_CMP_OC1REF = 4 << (4 + 16), TMR_MMS_CMP_OC2REF = 5 << (4 + 16),
+	TMR_MMS_CMP_OC3REF = 6 << (4 + 16), TMR_MMS_CMP_OC4REF = 7 << (4 + 16),
+	TMR_TI1S_CH1_ONLY = 0 << (7 + 16), TMR_TI1S_CH1_2_3 = 1 << (7 + 16),
+	TMR_OIS1_OC1_0 = 0 << (8 + 16), TMR_OIS1_OC1_1 = 1 << (8 + 16),
+	TMR_OIS1N_OC1N_0 = 0 << (9 + 16), TMR_OIS1N_OC1N_1 = 1 << (9 + 16),
+	TMR_OIS2_OC2_0 = 0 << (10 + 16),TMR_OIS2_OC2_1 = 1 << (10 + 16),
+	TMR_OIS2N_OC2N_0 = 0 << (11 + 16), TMR_OIS2N_OC2N_1 = 1 << (11 + 16),
+	TMR_OIS3_OC3_0 = 0 << (12 + 16), TMR_OIS3_OC3_1 = 1 << (12 + 16),
+	TMR_OIS3N_OC3N_0 = 0 << (13 + 16), TMR_OIS3N_OC3N_1 = 1 << (13 + 16),
+	TMR_OIS4_OC4_0 = 0 << (14 + 16), TMR_OIS4_OC4_1 = 1 << (14 + 16),
+
+	//SMCR
+	TMR_SLAVE_DISABLE = 0LL << (0 + 32), TMR_SLAVE_ENCODER_MODE1 = 1LL << (0 + 32), TMR_SLAVE_ENCODER_MODE2 = 2LL << (0 + 32),
+	TMR_SLAVE_ENCODER_MODE3 = 3LL << (0 + 32), TMR_SLAVE_RST = 4LL << (0 + 32), TMR_SLAVE_GATED = 5LL << (0 + 32),
+	TMR_SLAVE_TRIGGER = 6LL << (0 + 32), TMR_SLAVE_EXTERNAL_CLK = 7LL << (0 + 32),
+	TMR_TS_ITR0 = 0LL << (4 + 32), TMR_TS_ITR1 = 1LL << (4 + 32), TMR_TS_ITR2 = 2LL << (4 + 32),
+	TMR_TS_ITR3 = 3LL << (4 + 32), TMR_TS_TI1F_ED = 4LL << (4 + 32), TMR_TS_TI1FP1 = 5LL << (4 + 32), TMR_TS_TI2FP2= 6LL << (4 + 32),
+	TMR_TS_ETRF = 7LL << (4 + 32),
+	TMR_MSM =  1LL << (7 + 32),
+	TMR_ETF_NO_FILTER = 0LL << (8 + 32), TMR_ETF_FCK_INT_N2 = 1LL << (8 + 32), TMR_ETF_FCK_INT_N4 = 2LL << (8 + 32),
+	TMR_ETF_FCK_INT_N8 = 3LL << (8 + 32), TMR_ETF_FCK_DTS_DIV_2_N6 = 4LL << (8 + 32), TMR_ETF_FCK_DTS_DIV_2_N8 = 5LL << (8 + 32),
+	TMR_ETF_FCK_DTS_DIV_4_N6 = 6LL << (8 + 32), TMR_ETF_FCK_DTS_DIV_4_N8 = 7LL << (8 + 32), TMR_ETF_FCK_DTS_DIV_8_N6 = 8LL << (8 + 32),
+	TMR_ETF_FCK_DTS_DIV_8_N8 = 9LL << (8 + 32), TMR_ETF_FCK_DTS_DIV_16_N5 = 10LL << (8 + 32), TMR_ETF_FCK_DTS_DIV_16_N6 = 11LL << (8 + 32),
+	TMR_ETF_FCK_DTS_DIV_16_N8 = 12LL << (8 + 32), TMR_ETF_FCK_DTS_DIV_32_N5 = 13LL << (8 + 32), TMR_ETF_FCK_DTS_DIV_32_N6 = 14LL << (8 + 32),
+	TMR_ETF_FCK_DTS_DIV_32_N8 = 15LL << (8 + 32),
+	TMR_ETPS_PRESCALE_OFF = 0LL << (12 + 32), TMR_ETPS_ETRP_DIV_2 = 1LL << (12 + 32), TMR_ETPS_ETRP_DIV_4 = 2LL << (12 + 32),
+	TMR_ETPS_ETRP_DIV_3 = 3LL << (12 + 32),
+	TMR_ECE_CLOCK_MODE_2_DISABLE = 0LL << (14 + 32), TMR_ECE_CLOCK_MODE_2_ENSABLE = 1LL << (14 + 32),
+	TMR_ETP_ETR_NON_INVERTED = 0LL << (15 + 32), TMR_ETP_ETR_INVERTED = 1LL << (15 + 32),
+
+	//DIER
+	TMR_UIE_DISABLE = 0LL << (0 + 48), TMR_UIE_EN = 1LL << (0 + 48),
+	TMR_CC1IE_DISABLE = 0LL << (1 + 48), TMR_CC1IE_EN = 1LL << (1 + 48),
+	TMR_CC2IE_DISABLE = 0LL << (2 + 48), TMR_CC2IE_EN = 1LL << (2 + 48),
+	TMR_CC3IE_DISABLE = 0LL << (3 + 48), TMR_CC3IE_EN = 1LL << (3 + 48),
+	TMR_CC4IE_DISABLE = 0LL << (4 + 48), TMR_CC4IE_EN = 1LL << (4 + 48),
+	TMR_COMIE_DISABLE = 0LL << (5 + 48), TMR_COMIE_EN = 1LL << (5 + 48),
+	TMR_TIE_DISABLE = 0LL << (6 + 48), TMR_TIE_EN = 1LL << (6 + 48),
+	TMR_BIE_DISABLE = 0LL << (7 + 48), TMR_BIE_EN = 1LL << (7 + 48),
+	TMR_UDE_DISABLE = 0LL << (8 + 48), TMR_UDE_EN = 1LL << (8 + 48),
+	TMR_CC1DE_DISABLE = 0LL << (9 + 48), TMR_CC1DE_EN = 1LL << (9 + 48),
+	TMR_CC2DE_DISABLE = 0LL << (10 + 48), TMR_CC2DE_EN = 1LL << (10 + 48),
+	TMR_CC3DE_DISABLE = 0LL << (11 + 48), TMR_CC3DE_EN = 1LL << (11 + 48),
+	TMR_CC4DE_DISABLE = 0LL << (12 + 48), TMR_CC4DE_EN = 1LL << (12 + 48),
+	TMR_COM_DMA_REQUEST_DISABLE = 0LL << (13 + 48), TMR_COM_DMA_REQUEST_EN = 1LL << (13 + 48),
+	TMR_TRIGGER_DMA_DISABLE = 0LL << (14 + 48), TMR_TRIGGER_DMA_EN = 0LL << (14 + 48),
+}Tmrconfig_1;
+
+typedef enum{
+	//CCMR1
+	TMR_CC1S_OUTPUT = 0 << (0 + 16), TMR_CC1S_INPUT_IC1_TI1 = 1 << (0 + 16),
+	TMR_CC1S_INPUT_IC1_TI2 = 2 << (0 + 16), TMR_CC1S_INPUT_IC1_TRC = 3 << (0 + 16),
+	TMR_CC2S_OUTPUT = 0 << (8 + 16), TMR_CC2S_INPUT_IC2_TI2 = 1 << (8 + 16),
+	TMR_CC1S_INPUT_IC2_TI1 = 2 << (8 + 16), TMR_CC2S_INPUT_IC2_TRC = 3 << (8 + 16),
+
+	//Output compare mode only
+	TMR_OC1_FAST_EN = 1 << (2 + 16),
+	TMR_OC1_PRELOAD_EN = 1 << (3 + 16),
+	TMR_OC1M_FROZEN = 0 << (4 + 16), TMR_OC1M_CH1_ACTIVE_ON_MATCH = 1 << (4 + 16), TMR_OC1M_CH1_INACTIVE_ON_MATCH = 2 << (4 + 16),
+	TMR_OC1M_TOGGLE= 3 << (4 + 16), TMR_OC1M_FORCE_INACTIVE= 4 << (4 + 16), TMR_OC1M_FORCE_ACTIVE= 5 << (4 + 16),
+	TMR_OC1M_PWM_MODE1= 6 << (4 + 16), TMR_OC1M_PWM_MODE2= 7 << (4 + 16),
+	TMR_OC1_CLEAR_EN = 1 << (7 + 16),
+
+	TMR_OC2_FAST_EN = 1 << (10 + 16),
+	TMR_OC2_PRELOAD_EN = 1 << (11 + 16),
+	TMR_OC2M_FROZEN = 0 << (12 + 16), TMR_OC2M_CH1_ACTIVE_ON_MATCH = 1 << (12 + 16), TMR_OC2M_CH1_INACTIVE_ON_MATCH = 2 << (12 + 16),
+	TMR_OC2M_TOGGLE= 3 << (12 + 16), TMR_OC2M_FORCE_INACTIVE= 4 << (12 + 16), TMR_OC2M_FORCE_ACTIVE= 5 << (12 + 16),
+	TMR_OC2M_PWM_MODE1= 6 << (12 + 16), TMR_OC2M_PWM_MODE2= 7 << (12 + 16),
+	TMR_OC2_CLEAR_EN = 1 << (15 + 16),
+
+	//Input capture mode only
+	TMR_IC1PSC_OFF = 0 << (2 + 16), TMR_IC1PSC_2_EVENTS = 1 << (2 + 16), TMR_IC1PSC_4_EVENTS = 2 << (2 + 16),
+	TMR_IC1PSC_8_EVENTS = 3 << (2 + 16),
+	TMR_IC1F_NO_FILTER =  0 << (4 + 16), TMR_IC1F_FCK_INT_N2 = 1 << (4 + 16), TMR_IC1F_FCK_INT_N4 = 2 << (4 + 16),
+	TMR_IC1F_FCK_INT_N8 = 3 << (4 + 16), TMR_IC1F_FCK_DTS_DIV_2_N6 = 4 << (4 + 16), TMR_IC1F_FCK_DTS_DIV_2_N8 = 5 << (4 + 16),
+	TMR_IC1F_FCK_DTS_DIV_4_N6 = 6 << (4 + 16), TMR_IC1F_FCK_DTS_DIV_4_N8 = 7 << (4 + 16), TMR_IC1F_FCK_DTS_DIV_8_N6 = 8 <<(4 + 16),
+	TMR_IC1F_FCK_DTS_DIV_8_N8 = 9 << (4 + 16), TMR_IC1F_FCK_DTS_DIV_16_N5 = 10 << (4 + 16), TMR_IC1F_FCK_DTS_DIV_16_N6 = 11 << (4 + 16),
+	TMR_IC1F_FCK_DTS_DIV_16_N8 = 12 << (4 + 16), TMR_IC1F_FCK_DTS_DIV_32_N5 = 13 << (4 + 16), TMR_IC1F_FCK_DTS_DIV_32_N6 = 14 << (4 + 16),
+	TMR_IC1F_FCK_DTS_DIV_32_N8 = 15 << (4 + 16),
+
+	TMR_IC2PSC_OFF = 0 << (10 +16), TMR_IC2PSC_2_EVENTS = 1 << (10 +16), TMR_IC2PSC__4_EVENTS = 2 << (10 +16),
+	TMR_IC2PSC_8_EVENTS = 3 << (10 + 16),
+	TMR_IC2F_NO_FILTER =  0 << (12 + 16), TMR_IC2F_FCK_INT_N2 = 1 << (12 + 16), TMR_IC2F_FCK_INT_N4 = 2 << (12 + 16),
+	TMR_IC2F_FCK_INT_N8 = 3 << (12 + 16), TMR_IC2F_FCK_DTS_DIV_2_N6 = 4 << (12 + 16), TMR_IC2F_FCK_DTS_DIV_2_N8 = 5 << (12 + 16),
+	TMR_IC2F_FCK_DTS_DIV_4_N6 = 6 << (12 + 16), TMR_IC2F_FCK_DTS_DIV_4_N8 = 7 << (12 + 16), TMR_IC2F_FCK_DTS_DIV_8_N6 = 8 <<(12 + 16),
+	TMR_IC2F_FCK_DTS_DIV_8_N8 = 9 << (12 + 16), TMR_IC2F_FCK_DTS_DIV_16_N5 = 10 << (12 + 16), TMR_IC2F_FCK_DTS_DIV_16_N6 = 11 << (12 + 16),
+	TMR_IC2F_FCK_DTS_DIV_16_N8 = 12 << (12 + 16), TMR_IC2F_FCK_DTS_DIV_32_N5 = 13 << (12 + 16), TMR_IC2F_FCK_DTS_DIV_32_N6 = 14 << (12 + 16),
+	TMR_IC2F_FCK_DTS_DIV_32_N8 = 15 << (12 + 16),
+
+	//CCMR2
+	TMR_CC3S_OUTPUT = 0LL << (0 + 32), TMR_CC3S_INPUT_IC3_TI3 = 1LL << (0 + 32),
+	TMR_CC3S_INPUT_IC3_TI4 = 2LL << (0 + 32), TMR_CC1S_INPUT_IC3_TRC = 3LL << (0 + 32),
+	TMR_CC4S_OUTPUT = 0LL << (8 + 32), TMR_CC4S_INPUT_IC4_TI4 = 1LL << (8 + 32),
+	TMR_CC3S_INPUT_IC4_TI3 = 2LL << (8 + 32), TMR_CC4S_INPUT_IC4_TRC = 3LL << (0 + 32),
+
+	//Output compare mode only
+	TMR_OC3_FAST_EN = 1LL << (2 + 32),
+	TMR_OC3_PRELOAD_EN = 1LL << (3 + 32),
+	TMR_OC3M_FROZEN = 0LL << (4 + 32), TMR_OC3M_CH1_ACTIVE_ON_MATCH = 1LL << (4 + 32), TMR_OC3M_CH1_INACTIVE_ON_MATCH = 2LL << (4 + 32),
+	TMR_OC3M_TOGGLE= 3LL << (4 + 32), TMR_OC3M_FORCE_INACTIVE= 4LL << (4 + 32), TMR_OC3M_FORCE_ACTIVE= 5LL << (4 + 32),
+	TMR_OC3M_PWM_MODE1= 6LL << (4 + 32), TMR_OC3M_PWM_MODE2= 7LL << (4 + 32),
+	TMR_OC3_CLEAR_EN = 1LL << (7 + 32),
+
+	TMR_OSC4_FAST_EN = 1LL << (10 + 32),
+	TMR_OSC4_PRELOAD_EN = 1LL << (11 + 32),
+	TMR_OC4M_FROZEN = 0LL << (12 + 32), TMR_OC4M_CH1_ACTIVE_ON_MATCH = 1LL << (12 + 32), TMR_OC4M_CH1_INACTIVE_ON_MATCH = 2LL << (12 + 32),
+	TMR_OC4M_TOGGLE= 3LL << (12 + 32), TMR_OC4M_FORCE_INACTIVE= 4LL << (12 + 32), TMR_OC4M_FORCE_ACTIVE= 5LL << (12 + 32),
+	TMR_OC4M_PWM_MODE1= 6LL << (12 + 32), TMR_OC4M_PWM_MODE2= 7LL << (12 + 32),
+	TMR_OSC4_CLEAR_EN = 1LL << (15 + 32),
+
+	//Input capture mode only
+	TMR_IC3PSC_OFF = 0LL << (2 + 32), TMR_IC3PSC_2_EVENTS = 1LL << (2 + 32), TMR_IC3PSC_4_EVENTS = 2LL << (2 + 32),
+	TMR_IC3PSC_8_EVENTS = 3LL << (2 + 32),
+	TMR_IC3F_NO_FILTER =  0LL << (4 + 32), TMR_IC3F_FCK_INT_N2 = 1LL << (4 + 32), TMR_IC3F_FCK_INT_N4 = 2LL << (4 + 32),
+	TMR_IC3F_FCK_INT_N8 = 3LL << (4 + 32), TMR_IC3F_FCK_DTS_DIV_2_N6 = 4LL << (4 + 32), TMR_IC3F_FCK_DTS_DIV_2_N8 = 5LL << (4 + 32),
+	TMR_IC3F_FCK_DTS_DIV_4_N6 = 6LL << (4 + 32), TMR_IC3F_FCK_DTS_DIV_4_N8 = 7LL << (4 + 32), TMR_IC3F_FCK_DTS_DIV_8_N6 = 8LL <<(4 + 32),
+	TMR_IC3F_FCK_DTS_DIV_8_N8 = 9LL << (4 + 32), TMR_IC3F_FCK_DTS_DIV_16_N5 = 10LL << (4 + 32), TMR_IC3F_FCK_DTS_DIV_16_N6 = 11LL << (4 + 32),
+	TMR_IC3F_FCK_DTS_DIV_16_N8 = 12LL << (4 + 32), TMR_IC3F_FCK_DTS_DIV_32_N5 = 13LL << (4 + 32), TMR_IC3F_FCK_DTS_DIV_32_N6 = 14LL << (4 + 32),
+	TMR_IC3F_FCK_DTS_DIV_32_N8 = 15LL << (4 + 32),
+
+	TMR_IC4PSC_OFF = 0LL << (10 + 32), TMR_IC4PSC_2_EVENTS = 1LL << (10 + 32), TMR_IC4PSC__4_EVENTS = 2LL << (10 + 32),
+	TMR_IC4PSC_8_EVENTS = 3LL << (10 + 32),
+	TMR_IC4F_NO_FILTER =  0LL << (12 + 32), TMR_IC4F_FCK_INT_N2 = 1LL << (12 + 32), TMR_IC4F_FCK_INT_N4 = 2LL << (12 + 32),
+	TMR_IC4F_FCK_INT_N8 = 3LL << (12 + 32), TMR_IC4F_FCK_DTS_DIV_2_N6 = 4LL << (12 + 32), TMR_IC4F_FCK_DTS_DIV_2_N8 = 5LL << (12 + 32),
+	TMR_IC4F_FCK_DTS_DIV_4_N6 = 6LL << (12 + 32), TMR_IC4F_FCK_DTS_DIV_4_N8 = 7LL << (12 + 32), TMR_IC4F_FCK_DTS_DIV_8_N6 = 8LL <<(12 + 32),
+	TMR_IC4F_FCK_DTS_DIV_8_N8 = 9LL << (12 + 32), TMR_IC4F_FCK_DTS_DIV_16_N5 = 10LL << (12 + 32), TMR_IC4F_FCK_DTS_DIV_16_N6 = 11LL << (12 + 32),
+	TMR_IC4F_FCK_DTS_DIV_16_N8 = 12LL << (12 + 32), TMR_IC4F_FCK_DTS_DIV_32_N5 = 13LL << (12 + 32), TMR_IC4F_FCK_DTS_DIV_32_N6 = 14LL << (12 + 32),
+	TMR_IC4F_FCK_DTS_DIV_32_N8 = 15LL << (12 + 32),
+
+	//CCER
+	TMR_CC1NE_OUTPUT_OFF = 0LL << (2 + 48), TMR_CC1NE_OUTPUT_ON = 1 << (2 + 48),
+	TMR_CC1NP_OC1N_HIGH = 0LL << (3 + 48), TMR_CC1NP_OC1N_LOW = 1LL << (3 + 48),
+	TMR_CC2NE_OUTPUT_OFF = 0LL << (6 + 48), TMR_CC2NE_OUTPUT_ON = 0LL << (6 + 48),
+	TMR_CC2NP_OC1N_HIGH = 0LL << (7 + 48), TMR_CC1NP_OC2N_LOW = 1LL << (7 + 48),
+	TMR_CC3NE_OUTPUT_OFF = 0LL << (10 + 48), TMR_CC3NE_OUTPUT_ON = 0LL << (10 + 48),
+	TMR_CC3NP_OC1N_HIGH = 0LL << (11 + 48), TMR_CC3NP_OC2N_LOW = 1LL << (11 + 48),
+
+	//For CCx channel configured as OUTPUT
+	TMR_CC1_OUTPUT_OFF = 0LL << (0 + 48), TMR_CC1_OUTPUT_ON = 1LL << (0 + 48),
+	TMR_CC1P_OC1_HIGH = 0LL << (1 + 48), TMR_CC1P_OC1_LOW = 1LL << (1 + 48),
+	TMR_CC2_OUTPUT_OFF = 0LL << (4 + 48), TMR_CC2_OUTPUT_ON = 1LL << (4 + 48),
+	TMR_CC2P_OC1_HIGH = 0LL << (5 + 48), TMR_CC2P_OC1_LOW = 1LL << (5 + 48),
+	TMR_CC3_OUTPUT_OFF = 0LL << (8 + 48), TMR_CC3_OUTPUT_ON = 1LL << (8 + 48),
+	TMR_CC3P_OC1_HIGH = 0LL << (9 + 48), TMR_CC3P_OC1_LOW = 1LL << (9 + 48),
+	TMR_CC4_OUTPUT_OFF = 0LL << (12 + 48), TMR_CC4_OUTPUT_ON = 1LL << (12 + 48),
+	TMR_CC4P_OC1_HIGH = 0LL << (13 + 48), TMR_CC4P_OC1_LOW = 1LL << (13 + 48),
+
+	//For CCx channel configured as INPUT
+	TMR_CC1_INPUT_CAPTURE_DISABLE = 0LL << (0 + 48), TMR_CC1_INPUT_CAPTURE_EN = 1LL << (0 + 48),
+	TMR_CC1P_RISEING_EDGE = 0LL << (0 + 48), TMR_CC1P_FALLING_EDGE = 1LL << (1 + 48),
+	TMR_CC2_INPUT_CAPTURE_DISABLE = 0LL << (4 + 48), TMR_CC2_INPUT_CAPTURE_EN = 1LL << (4 + 48),
+	TMR_CC2P_RISEING_EDGE = 0LL << (5 + 48), TMR_CC2P_FALLING_EDGE = 1LL << (5 + 48),
+	TMR_CC3_INPUT_CAPTURE_DISABLE = 0LL << (8 + 48), TMR_CC3_INPUT_CAPTURE_EN = 1LL << (8 + 48),
+	TMR_CC3P_RISEING_EDGE = 0LL << (9 + 48), TMR_CC3P_FALLING_EDGE = 1LL << (9 + 48),
+	TMR_CC4_INPUT_CAPTURE_DISABLE = 0LL << (12 + 48), TMR_CC4_INPUT_CAPTURE_EN = 1LL << (12 + 48),
+	TMR_CC4P_RISEING_EDGE = 0LL << (13 + 48), TMR_CC4P_FALLING_EDGE = 1LL << (13 + 48),
+}Capture_Compare_Config_Timer;
+
+void tmrConfigure(TmrReg *tim, Tmrconfig_1 cfg);
+void tmrConfigureCaptureCompare(TmrReg *tim, int channel, Capture_Compare_Config_Timer cfg);
+void tmrConfigureEventGeneration(TmrReg *tim, TimerEventGenConfig cfg);
+
+#endif /* INC_TIMER_H_ */

@@ -1,0 +1,2 @@
+GPIO.c:10:5:gpioReadPin	16	static
+GPIO.c:14:6:gpioConfigurePin	24	static
